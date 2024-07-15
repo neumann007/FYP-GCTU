@@ -1,0 +1,114 @@
+
+
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+
+$font-family-sans-serif-2: 'Poppins', sans-serif;
+$font-family-serif: 'Source Serif Pro', serif;
+
+
+
+body {
+	font-family: $font-family-sans-serif;
+}
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+	font-family: $font-family-sans-serif;
+}
+a {
+	transition: .3s all ease;
+	&, &:hover {
+		text-decoration: none!important;
+	}
+}
+.content {
+	height: 70vh;
+}
+
+// footer 10
+.footer-39201 {
+	padding: 7rem 0;
+	color: lighten(#777, 15%);
+	.subscribe {
+		position: relative;
+		.form-control {
+			background-color: lighten(#ccc, 10%);
+			box-shadow: none;
+			border-radius: 30px;
+			height: 50px;
+			padding-left: 30px;
+			padding-right: 130px;
+			border: none;
+			color: $black;
+
+			&::-webkit-input-placeholder {
+			  color: darken(#ccc, 10%);
+			  font-style: italic;
+			  font-size: 14px;
+			}
+			&::-moz-placeholder {
+			  color: darken(#ccc, 10%);
+			  font-style: italic;
+			  font-size: 14px;
+			}
+			&:-ms-input-placeholder {
+			  color: darken(#ccc, 10%);
+			  font-style: italic;
+			  font-size: 14px;
+			}
+			&:-moz-placeholder {
+			  color: darken(#ccc, 10%);
+			  font-style: italic;
+			  font-size: 14px;
+			}
+		}
+		.btn-submit {
+			background: #614ad3;
+			height: 40px;
+			border-radius: 30px;
+			padding-left: 30px;
+			padding-right: 30px;
+			color: #fff;
+			font-weight: bold;
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			box-shadow: 0 2px 2px 0 rgba($black, .2);
+		}
+	}
+	h3 {
+		font-size: 16px;
+		font-weight: 900;
+		color: $black;
+		margin-bottom: 20px;
+	}
+
+	.nav-links {
+		li {
+			display: block;
+			margin-bottom: 10px;
+			a {
+				color: lighten(#777, 15%);
+				&:hover {
+					color: #614ad3;
+				}
+			}
+		}
+	}
+
+	.social {
+		li {
+			display: inline-block;
+			a {
+				display: inline-block;
+				padding: 10px;
+				color: lighten(#777, 15%);
+				&:hover {
+					color: #614ad3;
+				}
+			}
+		}
+	}
+
+}
