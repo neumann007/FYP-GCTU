@@ -7,9 +7,15 @@ const router = express.Router();
 router.post(
   "/signup",
   [
-    check("name").not().isEmpty(),
+    check("fName").not().isEmpty(),
+    check("lName").not().isEmpty(),
+    check("birthday").not().isEmpty(),
     check("email").normalizeEmail().isEmail(),
     check("password").isLength({ min: 6 }),
+    // check("region").not().isEmpty(),
+    // check("city").not().isEmpty(),
+    check("deliveryAddress").not().isEmpty(),
+    check("mobileNumber").not().isEmpty(),
   ],
   signup
 );

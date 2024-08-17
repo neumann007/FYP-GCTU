@@ -18,11 +18,23 @@ const storeSchema = new Schema({
     required: true,
     minlength: 6,
   },
-  location: {
+  region: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+  storeAddress: {
     type: String,
     required: true,
   },
   telephone: {
+    type: String,
+    required: true,
+  },
+  accType: {
     type: String,
     required: true,
   },
@@ -35,6 +47,6 @@ const storeSchema = new Schema({
   ],
 });
 
-userSchema.plugin(uniqueValidator);
+storeSchema.plugin(uniqueValidator);
 
 export default mongoose.model("Store", storeSchema);

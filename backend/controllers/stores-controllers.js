@@ -10,7 +10,8 @@ const signup = async (req, res, next) => {
       new HttpError("Invalid inputs passed, please check your data", 422)
     );
   }
-  const { storeName, email, password, location, telephone } = req.body;
+  const { storeName, email, password, region, city, storeAddress, telephone } =
+    req.body;
 
   let existingStore;
   try {
@@ -31,10 +32,12 @@ const signup = async (req, res, next) => {
   const createdStore = new Store({
     storeName,
     email,
-    username,
     password,
-    location,
+    region,
+    city,
     telephone,
+    storeAddress,
+    accType: "Store",
     products: [],
   });
 
@@ -45,7 +48,7 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json({ store: createdStore.toObject({ getters: true }) });
+  res.status(200).json({ user: createdStore.toObject({ getters: true }) });
 };
 
 const login = async (req, res, next) => {
@@ -67,7 +70,10 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ message: "Logged In" });
+  res.json({
+    message: "Logged In",
+    user: existingStore.toObject({ getters: true }),
+  });
 };
 
 export { signup, login };

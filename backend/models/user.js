@@ -4,11 +4,15 @@ import uniqueValidator from "mongoose-unique-validator";
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  fullname: {
+  fName: {
     type: String,
     required: true,
   },
-  dob: {
+  lName: {
+    type: String,
+    required: true,
+  },
+  birthday: {
     type: String,
     required: true,
   },
@@ -17,20 +21,20 @@ const userSchema = new Schema({
     required: true,
     unique: true,
   },
-  username: {
-    type: String,
-    required: true,
-  },
   password: {
     type: String,
     required: true,
     minlength: 6,
   },
-  deliveryAddress: {
+  region: {
     type: String,
     required: true,
   },
-  location: {
+  city: {
+    type: String,
+    required: true,
+  },
+  deliveryAddress: {
     type: String,
     required: true,
   },
@@ -41,6 +45,15 @@ const userSchema = new Schema({
   isArvUser: {
     type: Boolean,
     required: true,
+  },
+  accType: {
+    type: String,
+    required: true,
+  },
+  UserCart: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: "Cart",
   },
 });
 

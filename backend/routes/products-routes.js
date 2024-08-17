@@ -20,11 +20,15 @@ router.get("/", getAllProducts);
 router.post(
   "/",
   [
-    check("name").not().isEmpty(),
-    check("category").not().isEmpty(),
-    check("description").isLength({ min: 10 }),
+    check("title").not().isEmpty(),
+    check("imageUrl").not().isEmpty(),
     check("brand").not().isEmpty(),
     check("price").not().isEmpty(),
+    check("category").not().isEmpty(),
+    check("description").isLength({ min: 10 }),
+    check("storeId").not().isEmpty(),
+    check("stock").not().isEmpty(),
+    check("isArvDrug").not().isEmpty(),
   ],
   createProduct
 );
@@ -37,6 +41,8 @@ router.patch(
     check("description").isLength({ min: 10 }),
     check("brand").not().isEmpty(),
     check("price").not().isEmpty(),
+    check("storeId").not().isEmpty(),
+    check("stock").not().isEmpty(),
   ],
   updateProduct
 );

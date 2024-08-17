@@ -12,15 +12,16 @@ const signup = async (req, res, next) => {
     );
   }
   const {
-    fullname,
-    dob,
+    fName,
+    lName,
+    birthday,
     email,
-    username,
     password,
+    // region,
+    // city,
     deliveryAddress,
-    location,
     mobileNumber,
-    isArvUser,
+    stateArv,
   } = req.body;
 
   let existingUser;
@@ -39,16 +40,24 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  let arvStat = false;
+  if (stateArv === "true") {
+    console.log(typeof stateArv);
+    arvStat = true;
+  }
+
   const createdUser = new User({
-    fullname,
-    dob,
+    fName,
+    lName,
+    birthday,
     email,
-    username,
     password,
+    // region,
+    // city,
     deliveryAddress,
-    location,
     mobileNumber,
-    isArvUser,
+    isArvUser: arvStat,
+    accType: "User",
   });
 
   try {
@@ -80,7 +89,10 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ message: "Logged In" });
+  res.json({
+    message: "Logged In",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 export { signup, login };
