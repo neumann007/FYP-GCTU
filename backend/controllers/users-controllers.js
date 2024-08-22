@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import HttpError from "../models/http-error.js";
 import { validationResult } from "express-validator";
 import User from "../models/user.js";
+import Cart from "../models/cart.js";
 
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
@@ -28,7 +29,7 @@ const signup = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email: email });
   } catch (err) {
-    const error = new HttpError("Signing up failed, please try again", 500);
+    const error = new HttpError("Server error, please try again", 500);
     return next(error);
   }
 
@@ -63,11 +64,28 @@ const signup = async (req, res, next) => {
   try {
     await createdUser.save();
   } catch (err) {
+    console.log(err);
     const error = new HttpError("Signing up failed, please try again", 500);
     return next(error);
   }
 
-  res.status(200).json({ user: createdUser.toObject({ getters: true }) });
+  const createdSession = new Cart({
+    userId: createdUser._id,
+    totalPrice: 0,
+    itemsCount: 0,
+  });
+
+  try {
+    await createdSession.save();
+  } catch (err) {
+    const error = new HttpError("Couldn't create user, please try again", 500);
+    return next(error);
+  }
+
+  res.status(200).json({
+    user: createdUser.toObject({ getters: true }),
+    cart: createdSession.toObject({ getters: true }),
+  });
 };
 
 const login = async (req, res, next) => {
@@ -89,9 +107,21 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
+  let shoppingSession;
+  try {
+    shoppingSession = await Cart.find({ userId: existingUser._id });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching product failed, please try again",
+      500
+    );
+    return next(error);
+  }
+
   res.json({
     message: "Logged In",
     user: existingUser.toObject({ getters: true }),
+    cart: shoppingSession,
   });
 };
 

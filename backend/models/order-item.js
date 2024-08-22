@@ -15,9 +15,10 @@ const orderItemSchema = new Schema({
     required: true,
     ref: "Product",
   },
-  productName: {
-    type: String,
+  storeId: {
+    type: mongoose.Types.ObjectId,
     required: true,
+    ref: "Store",
   },
   totalPrice: {
     type: Number,
@@ -25,6 +26,22 @@ const orderItemSchema = new Schema({
   },
   totalQuantity: {
     type: Number,
+    required: true,
+  },
+  placedAt: {
+    type: Date,
+  },
+  processedAt: {
+    type: Date,
+  },
+  shippedAt: {
+    type: Date,
+  },
+  deliveredAt: {
+    type: Date,
+  },
+  orderStatus: {
+    type: String,
     required: true,
   },
 });

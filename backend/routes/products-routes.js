@@ -1,5 +1,6 @@
 import express from "express";
 import { check } from "express-validator";
+
 import {
   createProduct,
   deleteProduct,
@@ -8,6 +9,7 @@ import {
   getProductsByStoreId,
   updateProduct,
 } from "../controllers/products-controllers.js";
+import fileUpload from "../middleware/file-upload.js";
 
 const router = express.Router();
 
@@ -19,9 +21,9 @@ router.get("/", getAllProducts);
 
 router.post(
   "/",
+  fileUpload.single("image"),
   [
     check("title").not().isEmpty(),
-    check("imageUrl").not().isEmpty(),
     check("brand").not().isEmpty(),
     check("price").not().isEmpty(),
     check("category").not().isEmpty(),

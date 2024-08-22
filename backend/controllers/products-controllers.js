@@ -1,8 +1,9 @@
 import { validationResult } from "express-validator";
+import fs from "fs";
+
 import HttpError from "../models/http-error.js";
 import Product from "../models/product.js";
 import Store from "../models/store.js";
-// import mongoose from "mongoose";
 
 const getProductById = async (req, res, next) => {
   const productId = req.params.pid;
@@ -78,7 +79,6 @@ const createProduct = async (req, res, next) => {
   }
   const {
     title,
-    imageUrl,
     brand,
     price,
     category,
@@ -90,7 +90,7 @@ const createProduct = async (req, res, next) => {
 
   const createdProduct = new Product({
     title,
-    imageUrl,
+    image: req.file.path,
     brand,
     price,
     category,
@@ -115,8 +115,6 @@ const createProduct = async (req, res, next) => {
 
   try {
     await createdProduct.save();
-    store.products.push(createdProduct);
-    await store.save();
   } catch (err) {
     console.log(err);
   }
@@ -183,10 +181,10 @@ const deleteProduct = async (req, res, next) => {
     return next(error);
   }
 
+  const imagePath = product.image;
+
   try {
-    
     await product.remove();
-    await product.storeId.products.pull(product);
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not update product",
@@ -194,6 +192,11 @@ const deleteProduct = async (req, res, next) => {
     );
     return next(error);
   }
+
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
+
   res.status(200).json({ message: "Deleted Successfully." });
 };
 
