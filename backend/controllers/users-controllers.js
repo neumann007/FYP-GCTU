@@ -1,4 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
+
 import HttpError from "../models/http-error.js";
 import { validationResult } from "express-validator";
 import User from "../models/user.js";
@@ -17,13 +21,16 @@ const signup = async (req, res, next) => {
     lName,
     birthday,
     email,
+    ethAccount,
     password,
-    // region,
-    // city,
+    region,
+    city,
     deliveryAddress,
     mobileNumber,
     stateArv,
   } = req.body;
+
+  console.log(req.body);
 
   let existingUser;
   try {
@@ -41,10 +48,15 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  let arvStat = false;
-  if (stateArv === "true") {
-    console.log(typeof stateArv);
-    arvStat = true;
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Could  not create user, please try again",
+      500
+    );
+    return next(error);
   }
 
   const createdUser = new User({
@@ -52,13 +64,14 @@ const signup = async (req, res, next) => {
     lName,
     birthday,
     email,
-    password,
-    // region,
-    // city,
+    ethAccount,
+    password: hashedPassword,
+    region,
+    city,
     deliveryAddress,
     mobileNumber,
-    isArvUser: arvStat,
-    accType: "User",
+    arvRights: stateArv,
+    accType: "USER",
   });
 
   try {
@@ -82,9 +95,33 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json({
-    user: createdUser.toObject({ getters: true }),
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: createdUser._id,
+        email: createdUser.email,
+        accType: createdUser.accType,
+        arvRights: createdUser.arvRights,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("Couldn't create user, please try again", 500);
+    return next(error);
+  }
+
+  // console.log(createdUser);
+  // console.log(token);
+
+  return res.status(201).json({
+    userId: createdUser._id,
+    email: createdUser.email,
+    accType: createdUser.accType,
+    arvRights: createdUser.arvRights,
     cart: createdSession.toObject({ getters: true }),
+    token: token,
   });
 };
 
@@ -99,7 +136,27 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  if (!existingUser || existingUser.password !== password) {
+  if (!existingUser) {
+    const error = new HttpError(
+      "Invalid Credentials, could not log you in. Check email and password again",
+      401
+    );
+    return next(error);
+  }
+
+  let isValidPassword = false;
+
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not log you in, please check your credentials and try again.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
     const error = new HttpError(
       "Invalid Credentials, could not log you in. Check email and password again",
       401
@@ -118,10 +175,30 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: existingUser._id,
+        email: existingUser.email,
+        accType: existingUser.accType,
+        arvRights: existingUser.arvRights,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("Couldn't create user, please try again", 500);
+    return next(error);
+  }
+
   res.json({
-    message: "Logged In",
-    user: existingUser.toObject({ getters: true }),
+    userId: existingUser._id,
+    email: existingUser.email,
+    accType: existingUser.accType,
+    arvRights: existingUser.arvRights,
     cart: shoppingSession,
+    token: token,
   });
 };
 

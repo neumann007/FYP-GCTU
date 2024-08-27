@@ -10,8 +10,11 @@ import {
   updateProduct,
 } from "../controllers/products-controllers.js";
 import fileUpload from "../middleware/file-upload.js";
+import checkAuth from "../middleware/check-auth.js";
 
 const router = express.Router();
+
+// router.use(checkAuth);
 
 router.get("/:pid", getProductById);
 

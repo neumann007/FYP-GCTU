@@ -14,6 +14,11 @@ const storeSchema = new Schema(
       required: true,
       unique: true,
     },
+    ethAccount: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     password: {
       type: String,
       required: true,
@@ -32,6 +37,10 @@ const storeSchema = new Schema(
       required: true,
     },
     telephone: {
+      type: String,
+      required: true,
+    },
+    arvRights: {
       type: String,
       required: true,
     },

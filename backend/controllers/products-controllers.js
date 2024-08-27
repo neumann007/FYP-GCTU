@@ -88,6 +88,14 @@ const createProduct = async (req, res, next) => {
     isArvDrug,
   } = req.body;
 
+  // if (product.storeId.toString() !== req.userData.userId) {
+  //   const error = new HttpError(
+  //     "You are not allowed to create a product",
+  //     401
+  //   );
+  //   return next(error);
+  // }
+
   const createdProduct = new Product({
     title,
     image: req.file.path,
@@ -102,7 +110,7 @@ const createProduct = async (req, res, next) => {
 
   let store;
   try {
-    store = await Store.findById(storeId);
+    store = await Store.findById(req.userData.userId);
   } catch (err) {
     const error = new HttpError("Something went wrong, please try again", 500);
     return next(error);
@@ -144,6 +152,14 @@ const updateProduct = async (req, res, next) => {
     return next(error);
   }
 
+  if (product.storeId.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "You are not allowed to edit this product",
+      401
+    );
+    return next(error);
+  }
+
   product.name = name;
   product.brand = brand;
   product.price = price;
@@ -178,6 +194,14 @@ const deleteProduct = async (req, res, next) => {
 
   if (!product) {
     const error = new HttpError("Could not find product for this Id", 404);
+    return next(error);
+  }
+
+  if (product.storeId.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "You are not allowed to delete this product",
+      401
+    );
     return next(error);
   }
 

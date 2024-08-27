@@ -22,6 +22,11 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
+    ethAccount: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     password: {
       type: String,
       required: true,
@@ -29,11 +34,11 @@ const userSchema = new Schema(
     },
     region: {
       type: String,
-      // required: true,
+      required: true,
     },
     city: {
       type: String,
-      // required: true,
+      required: true,
     },
     deliveryAddress: {
       type: String,
@@ -43,8 +48,8 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    isArvUser: {
-      type: Boolean,
+    arvRights: {
+      type: String,
       required: true,
     },
     accType: {

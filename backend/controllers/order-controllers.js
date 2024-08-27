@@ -1,10 +1,10 @@
-import HttpError from "../models/http-error";
-import Cart from "../models/cart";
-import CartItem from "../models/cart-item";
-import Order from "../models/order";
-import User from "../models/user";
-import OrderItem from "../models/order-item";
-import Product from "../models/product";
+import HttpError from "../models/http-error.js";
+import Cart from "../models/cart.js";
+import CartItem from "../models/cart-item.js";
+import Order from "../models/order.js";
+import User from "../models/user.js";
+import OrderItem from "../models/order-item.js";
+import Product from "../models/product.js";
 
 const createOrder = async (req, res, next) => {
   const { userId, orderNumber, totalPrice, deliveryAddress, details } =

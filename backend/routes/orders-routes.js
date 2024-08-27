@@ -7,7 +7,7 @@ import {
   getOrderItemById,
   createOrder,
   updateOrderItem,
-} from "../controllers/order-controllers";
+} from "../controllers/order-controllers.js";
 
 const router = express.Router();
 

@@ -2,9 +2,11 @@ import HttpError from "../models/http-error.js";
 import Product from "../models/product.js";
 import CartItem from "../models/cart-item.js";
 import Cart from "../models/cart.js";
+import product from "../models/product.js";
 
 const addCartItem = async (req, res, next) => {
   const { userId, productId, quantity } = req.body;
+  // console.log(req.body);
 
   let shoppingSession;
   try {
@@ -99,13 +101,26 @@ const getCartItemsByUserId = async (req, res, next) => {
     return next(error);
   }
 
+  let products;
+  try {
+    products = await Product.find();
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching Products failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+  // console.log(products);
+
   if (!cartItems || cartItems.length === 0) {
     return next(
       new HttpError("Could not find cart items for the provided Id", 404)
     );
   } else {
     res.json({
-      cartItems: cartItems.map((items) => items.toObject({ getters: true })),
+      products: products,
+      cartItems: cartItems,
     });
   }
 };
@@ -135,22 +150,24 @@ const checkCartForProduct = async (req, res, next) => {
 
   if (existingItem) {
     res.json({
-      cartProduct: existingItem.toObject({ getters: true }),
+      cartItem: existingItem.toObject({ getters: true }),
     });
   }
 };
 
 const updateCartItem = async (req, res, next) => {
-  const { quantity } = req.body;
   const itemId = req.params.cid;
+  const { quantity } = req.body;
+  // console.log(req.body);
 
   let cartItem;
   try {
-    cartItem = await Cart.findById(itemId);
+    cartItem = await CartItem.findById(itemId);
   } catch (err) {
     const error = new HttpError("Server Error, could not find cart item", 500);
     return next(error);
   }
+  // console.log(cartItem);
 
   let product;
   try {
@@ -169,7 +186,7 @@ const updateCartItem = async (req, res, next) => {
   }
 
   cartItem.totalQuantity = quantity;
-  cartItem.totalPrice = product.price;
+  cartItem.totalPrice = product.price * quantity;
 
   try {
     await cartItem.save();
@@ -187,7 +204,7 @@ const deleteCartItem = async (req, res, next) => {
   const itemId = req.params.cid;
   let cartItem;
   try {
-    await CartItem.findById(itemId).populate("cartId");
+    cartItem = await CartItem.findById(itemId);
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete product",
@@ -202,7 +219,7 @@ const deleteCartItem = async (req, res, next) => {
   }
 
   try {
-    await cartItem.remove();
+    await CartItem.findByIdAndDelete(itemId);
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not remove cart item",

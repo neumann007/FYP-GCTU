@@ -1,3 +1,6 @@
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
 import HttpError from "../models/http-error.js";
 import { validationResult } from "express-validator";
 import Store from "../models/store.js";
@@ -29,16 +32,27 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Could  not create user, please try again",
+      500
+    );
+    return next(error);
+  }
+
   const createdStore = new Store({
     storeName,
     email,
-    password,
+    password: hashedPassword,
     region,
     city,
     telephone,
     storeAddress,
-    accType: "Store",
-    products: [],
+    arvRights: "ENABLED",
+    accType: "STORE",
   });
 
   try {
@@ -48,7 +62,30 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json({ user: createdStore.toObject({ getters: true }) });
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: createdStore._id,
+        email: createdStore.email,
+        accType: createdStore.accType,
+        arvRights: createdStore.arvRights,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("Couldn't create user, please try again", 500);
+    return next(error);
+  }
+
+  res.status(200).json({
+    userId: existingStore._id,
+    email: existingStore.email,
+    accType: existingStore.accType,
+    arvRights: existingStore.arvRights,
+    token: token,
+  });
 };
 
 const login = async (req, res, next) => {
@@ -62,7 +99,7 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  if (!existingStore || existingStore.password !== password) {
+  if (!existingStore) {
     const error = new HttpError(
       "Invalid Credentials, could not log you in. Check email and password again",
       401
@@ -70,9 +107,49 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
+  let isValidPassword = false;
+
+  try {
+    isValidPassword = await bcrypt.compare(password, existingStore.password);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not log you in, please check your credentials and try again.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError(
+      "Invalid Credentials, could not log you in. Check email and password again",
+      401
+    );
+    return next(error);
+  }
+
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: existingStore._id,
+        email: existingStore.email,
+        accType: existingStore.accType,
+        arvRights: existingStore.arvRights,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("Couldn't create user, please try again", 500);
+    return next(error);
+  }
+
   res.json({
-    message: "Logged In",
-    user: existingStore.toObject({ getters: true }),
+    userId: existingStore._id,
+    email: existingStore.email,
+    accType: existingStore.accType,
+    arvRights: existingStore.arvRights,
+    token: token,
   });
 };
 

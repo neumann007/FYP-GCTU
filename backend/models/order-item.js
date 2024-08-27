@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
-import product from "./product";
 
 const Schema = mongoose.Schema;
 

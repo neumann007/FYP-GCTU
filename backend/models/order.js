@@ -34,6 +34,6 @@ const orderSchema = new Schema(
   { timestamps: true }
 );
 
-cartSchema.plugin(uniqueValidator);
+orderSchema.plugin(uniqueValidator);
 
 export default mongoose.model("Order", orderSchema);
